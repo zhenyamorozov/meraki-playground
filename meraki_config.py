@@ -2,9 +2,8 @@
 # lab_description = os.popen('vmtoolsd --cmd="info-get guestinfo.lasaction.1"').read()
 
 from dotenv import dotenv_values
-
-
 lab_description = dotenv_values(".env")["LAB_DESCRIPTION"]
+
 lab_description = lab_description.replace('set_computer_description~~','')
 lab_description = lab_description.replace('\n','')
 lab_description = lab_description.split(',')

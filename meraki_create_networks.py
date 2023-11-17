@@ -45,9 +45,5 @@ def create_networks():
         )
         
 
-
-
-
-
 if __name__=="__main__":
     create_networks()
