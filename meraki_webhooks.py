@@ -21,20 +21,6 @@ def get_networks():
     return resp.json()
 
 
-# Get current alerts settings, including configured receivers and webhooks
-def get_alert_settings(network_id):
-
-    url = f"https://{MERAKI_URL}/networks/{network_id}/alerts/settings"
-
-    resp = requests.get(
-        url,
-        headers={
-            'X-Cisco-Meraki-API-Key': MERAKI_API_KEY,
-            'Content-Type': "application-json"
-        }
-    )
-    return resp.json()
-
 # Create a webhook HTTP receiver for a network
 def create_webhook_httpServer(network_id, server_name, server_url, secret=""):
     url = f"https://{MERAKI_URL}/networks/{network_id}/webhooks/httpServers"
@@ -65,7 +51,21 @@ def delete_webhook_httpServer(network_id, httpReceiver_id):
         }
     )
 
-# Set HTTP webhooks receiver in alert settings
+# Get current alerts settings, including configured receivers and webhooks
+def get_alert_settings(network_id):
+
+    url = f"https://{MERAKI_URL}/networks/{network_id}/alerts/settings"
+
+    resp = requests.get(
+        url,
+        headers={
+            'X-Cisco-Meraki-API-Key': MERAKI_API_KEY,
+            'Content-Type': "application-json"
+        }
+    )
+    return resp.json()
+
+# Set HTTP webhooks receiver as default destination in alert settings
 def set_alert_receiver(network_id, httpServer_id):
     url = f"https://{MERAKI_URL}/networks/{network_id}/alerts/settings"
 
@@ -85,6 +85,23 @@ def set_alert_receiver(network_id, httpServer_id):
     )
     return resp.json()
 
+# turn on alerts for specific event types
+def set_alerts(network_id, alerts=[]):
+    url = f"https://{MERAKI_URL}/networks/{network_id}/alerts/settings"
+
+    resp = requests.put(
+        url,
+        headers={
+            'X-Cisco-Meraki-API-Key': MERAKI_API_KEY,
+            'Content-Type': "application/json"
+        },
+        data=json.dumps({
+            'alerts':[
+                {'type':alert, 'enabled': True} for alert in alerts
+            ]
+        })
+    )
+    return resp.json()
 
 
 if __name__=="__main__":
@@ -105,6 +122,9 @@ if __name__=="__main__":
 
     # set this httpServer as webhooks receiver
     alert_settings = set_alert_receiver(network_id, httpServer['id'])
+
+    # turn on specific alert types
+    alert_settings = set_alerts(network_id, ["rogueAp", "gatewayDown", "settingsChanged"])
     
     # request and again, print currently configured alert settings
     print(json.dumps(get_alert_settings(network_id)['defaultDestinations'], indent=4))
