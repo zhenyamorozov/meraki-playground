@@ -51,6 +51,20 @@ def delete_webhook_httpServer(network_id, httpReceiver_id):
         }
     )
 
+# List webhook HTTP receivers for a network
+def list_webhook_httpServers(network_id):
+    url = f"https://{MERAKI_URL}/networks/{network_id}/webhooks/httpServers/"
+
+    resp = requests.get(
+        url,
+        headers={
+            'X-Cisco-Meraki-API-Key': MERAKI_API_KEY,
+            'Content-Type': "application/json"
+        }
+    )
+    return resp.json()
+
+
 # Get current alerts settings, including configured receivers and webhooks
 def get_alert_settings(network_id):
 
@@ -134,6 +148,14 @@ if __name__=="__main__":
 
     # is alert settings still pointing to the (now deleted) httpServerID ??   - NO, it is also cleaned up, good!
     print(json.dumps(get_alert_settings(network_id)['defaultDestinations'], indent=4))    
+
+    # clean up all configured HTTP webhook receivers
+    if True:
+        httpServers = list_webhook_httpServers(network_id)
+        for httpServer in httpServers:
+            delete_webhook_httpServer(network_id, httpServer['id'])
+
+
 
 
 
