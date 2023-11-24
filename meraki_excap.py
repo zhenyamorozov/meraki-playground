@@ -29,7 +29,7 @@ meraki_app = Flask(__name__)
 
 @meraki_app.route("/", methods=["GET"])
 def root():
-    return redirect(url_for("splash"), 307)
+    return redirect(url_for("splash", **request.args))  # redirect while keeping all URL arguments
 
 @meraki_app.route("/splash", methods=["GET"])
 def splash():
@@ -86,7 +86,7 @@ if __name__=="__main__":
     splashSettings = merakiApi.wireless.updateNetworkWirelessSsidSplashSettings(
         networkId=network['id'],
         number=ssid['number'],
-        splashUrl=public_url+"/splash",
+        splashUrl=public_url, #+"/splash",
         useSplashUrl=True,
         redirectUrl="https://meraki.cisco.com",
         useRedirectUrl=True,
